@@ -6,9 +6,14 @@ import AllMovies from "../../modules/movies/screens/AllMovies";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import Favorite from "../../modules/movies/screens/Favorite";
+import userSlice from "../../app/store/userSlice";
 
 const Stack = createStackNavigator();
 const BottomTab = createBottomTabNavigator();
+export type RootNavigationProps = {
+Home:undefined;
+Detail:undefined;
+}
 
 function BottomTabNavigator() {
   return (

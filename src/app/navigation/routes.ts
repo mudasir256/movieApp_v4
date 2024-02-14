@@ -12,4 +12,8 @@ export enum LoginStackRoutes {
   Splash = "Splash",
   Login = "Login",
   SignUp = "SignUp",
+  HomeStack = "Home"
 }
+
+
+

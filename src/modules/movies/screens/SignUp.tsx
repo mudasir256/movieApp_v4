@@ -1,58 +1,27 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Keyboard, Alert, TouchableWithoutFeedback } from "react-native";
-import { useDispatch } from "react-redux";
 import { StatusBar } from "expo-status-bar";
+import { createUserWithEmailAndPassword } from "firebase/auth"; 
+import { getAuth } from "firebase/auth"; 
 import Input from "../../../app/components/Input";
 import Button from "../../../app/components/Button";
-import { loginUser } from "../../../app/store/userSlice";
 
 const SignUp = () => {
-  const dispatch = useDispatch();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const auth = getAuth(); 
 
-  const handleChange = (field, value) => {
-
-    if (field === "email" && !value.includes("@")) {
-      Alert.alert("Invalid Email", "Please enter a valid email address.");
-      return;
-    }
-
-    setFormData((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
-  };
-
-  const handleSignUp = () => {
- 
-    if (formData.password !== formData.confirmPassword) {
-      Alert.alert("Password Mismatch", "Passwords do not match.");
-      return;
-    }
-    dispatch(loginUser(formData));
-
-    console.log("Form Data:", formData);
-
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    });
-
-    Keyboard.dismiss();
+  const handleSignUp = async () => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(userCredentials => {
+        const user = userCredentials.user;
+        console.log(user.email); 
+      })
+      .catch(error => alert(error.message));
   };
 
   const handleTouchablePress = () => {
-
     Keyboard.dismiss();
   };
 
@@ -62,33 +31,23 @@ const SignUp = () => {
         <View style={styles.container}>
           <StatusBar style="light" />
           <Input
-            placeholder="First Name"
+            placeholder="Enter Email"
             style={styles.input}
-            onChangeText={(text) => handleChange("firstName", text)}
+            value={email}
+            onChangeText={(text) => setEmail(text)}
           />
           <Input
-            placeholder="Last Name"
-            style={styles.input}
-            onChangeText={(text) => handleChange("lastName", text)}
-          />
-          <Input
-            placeholder="Email"
-            style={styles.input}
-            onChangeText={(text) => handleChange("email", text)}
-          />
-          <Input
-            placeholder="Password"
+            placeholder="Enter Password"
             style={styles.input}
             secureTextEntry
-            onChangeText={(text) => handleChange("password", text)}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
           />
-          <Input
-            placeholder="Confirm Password"
-            style={styles.input}
-            secureTextEntry
-            onChangeText={(text) => handleChange("confirmPassword", text)}
+          <Button
+            onPress={handleSignUp}
+            label="Sign Up"
+            style={styles.button}
           />
-          <Button onPress={handleSignUp} label="Sign Up" style={styles.button} />
         </View>
       </TouchableWithoutFeedback>
     </>

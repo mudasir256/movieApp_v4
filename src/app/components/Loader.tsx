@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgb(255 255 255)',
+    backgroundColor: "seashell",
   },
 });
 

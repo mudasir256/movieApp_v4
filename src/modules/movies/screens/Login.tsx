@@ -1,47 +1,77 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, TouchableWithoutFeedback, Keyboard, Alert } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Alert,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../../../app/store/userSlice";
 import Input from "../../../app/components/Input";
 import Button from "../../../app/components/Button";
 import { Ionicons } from "@expo/vector-icons";
-import Loader from "../../../app/components/Loader"; 
+import Loader from "../../../app/components/Loader";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootNavigationProps } from "../../../app/navigation/LoginStack";
-import { AppDispatch } from "../../../app/store/store";
-import { HomeStackRoutes } from "../../../app/navigation/routes";
+import { HomeStackRoutes, LoginStackRoutes } from "../../../app/navigation/routes";
+import { signInWithEmailAndPassword } from "@firebase/auth";
+import { getAuth } from "firebase/auth";
 
-type LoginScreenNavigationProp = StackNavigationProp<RootNavigationProps, "Login">;
+type LoginScreenNavigationProp = StackNavigationProp<
+  RootNavigationProps,
+  "Login"
+>;
 
 const Login = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
-
+  const auth = getAuth();
   const handleTouchablePress = () => {
     Keyboard.dismiss();
   };
-
   const handleLoginPress = async () => {
     try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       setShowLoader(true);
-      if (!email || !password) {
-        throw new Error("Please enter both email and password");
-      }
-      await dispatch(loginUser({ email, password }));
+      const user = userCredential.user;
+      console.log(user.email);
+      // Navigate to the "Home" screen through the LoginStack
       navigation.navigate(HomeStackRoutes.Home);
-    } catch (error) {
-      console.error("Authentication Error:", error.message);
-      Alert.alert("Authentication Error", "Invalid email or password. Please try again.");
-    } finally {
       setShowLoader(false);
+    } catch (error) {
+      alert(error.message);
     }
   };
-  
+  // const handleLoginPress = async () => {
+  //   try {
+  //     setShowLoader(true);
+  //     if (!email || !password) {
+  //       throw new Error("Please enter both email and password");
+  //     }
+  //     await dispatch(loginUser({ email, password }));
+  //     navigation.navigate(HomeStackRoutes.Home);
+  //   } catch (error) {
+  //     console.error("Authentication Error:", error.message);
+  //     Alert.alert(
+  //       "Authentication Error",
+  //       "Invalid email or password. Please try again."
+  //     );
+  //   } finally {
+  //     setShowLoader(false);
+  //   }
+  // };
+
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
@@ -77,8 +107,11 @@ const Login = () => {
                 onPress: togglePasswordVisibility,
               }}
             />
-            {showLoader && <Loader isLoading={undefined} />}
-            <Button onPress={handleLoginPress} label={"Log In"} style={undefined} />
+            <Button
+              onPress={handleLoginPress}
+              label={"Log In"}
+              style={undefined}
+            />
             <View style={styles.signUpContainer}>
               <Text onPress={handleSignUpPress} style={styles.signUpText}>
                 Sign Up
@@ -86,6 +119,11 @@ const Login = () => {
             </View>
           </View>
         </View>
+        {showLoader && (
+          <View style={styles.loader}>
+            <Loader isLoading={true} />
+          </View>
+        )}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -122,6 +160,16 @@ const styles = StyleSheet.create({
     color: "#421A37",
     fontWeight: "bold",
     textAlign: "right",
+  },
+  loader: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 });
 

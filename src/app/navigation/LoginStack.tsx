@@ -1,15 +1,16 @@
 import {  StackNavigationProp, createStackNavigator } from "@react-navigation/stack";
-import { LoginStackRoutes } from "./routes";
+import { HomeStackRoutes, LoginStackRoutes } from "./routes";
 import Login from "../../modules/movies/screens/Login";
 import Splash from "../../modules/movies/screens/Splash";
 import SignUp from "../../modules/movies/screens/SignUp";
-
+import HomeStack from "./HomeStack";
 const Stack = createStackNavigator();
 
 export type RootNavigationProps = {
   Login: undefined;
-  Home: undefined;
+  Splash: undefined;
   SignUp: undefined;
+  Home: undefined;
 }
 
 const LoginStack = () => (
@@ -35,8 +36,14 @@ const LoginStack = () => (
         headerTintColor: "#ffffff",
       })}
     />
+        <Stack.Screen
+      name={HomeStackRoutes.Home}
+      component={HomeStack}
+      options={{
+        headerShown: false,
+      }}
+    />
   </Stack.Navigator>
 );
 
 export default LoginStack;
-// export type RootNavigationProps = StackNavigationProp<LoginStackParamsList>;
