@@ -46,7 +46,6 @@ const Login = () => {
       setShowLoader(true);
       const user = userCredential.user;
       console.log(user.email);
-      // Navigate to the "Home" screen through the LoginStack
       navigation.navigate(HomeStackRoutes.Home);
       setShowLoader(false);
     } catch (error) {

@@ -41,6 +41,7 @@ const LoginStack = () => (
       component={HomeStack}
       options={{
         headerShown: false,
+
       }}
     />
   </Stack.Navigator>
