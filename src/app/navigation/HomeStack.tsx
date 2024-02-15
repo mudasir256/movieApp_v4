@@ -1,16 +1,25 @@
+import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { HomeStackRoutes, MoviesStackRoutes } from "./routes";
+import { HomeStackRoutes, LoginStackRoutes, MoviesStackRoutes } from "./routes";
 import MovieDetailsModal from "../../modules/movies/screens/MovieDetailsModal";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AllMovies from "../../modules/movies/screens/AllMovies";
-import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import Favorite from "../../modules/movies/screens/Favorite";
+import { TouchableOpacity } from "react-native";
+import LoginStack from "./LoginStack";
+import { useNavigation } from "@react-navigation/native";
 
 const Stack = createStackNavigator();
 const BottomTab = createBottomTabNavigator();
 
-function BottomTabNavigator() {
+const BottomTabNavigator = () => {
+  const navigation = useNavigation();
+
+  const handleLogout = () => {
+    navigation.navigate(LoginStackRoutes.Login);
+  };
+
   return (
     <BottomTab.Navigator
       screenOptions={() => ({
@@ -29,6 +38,14 @@ function BottomTabNavigator() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="film" size={size} color={color} />
           ),
+          headerRight: () => (
+            <TouchableOpacity
+              style={{ marginRight: 10 }}
+              onPress={handleLogout}
+            >
+              <Ionicons name="log-out" size={24} color="white" />
+            </TouchableOpacity>
+          ),
         })}
       />
       <BottomTab.Screen
@@ -44,7 +61,7 @@ function BottomTabNavigator() {
       />
     </BottomTab.Navigator>
   );
-}
+};
 
 const HomeStack = () => (
   <Stack.Navigator initialRouteName={HomeStackRoutes.Home}>
@@ -61,6 +78,11 @@ const HomeStack = () => (
         headerStyle: { backgroundColor: "#421A37" },
         headerTintColor: "#ffffff",
       })}
+    />
+    <Stack.Screen
+      name={LoginStackRoutes.Login}
+      component={LoginStack}
+      options={{ headerShown: false }}
     />
   </Stack.Navigator>
 );
