@@ -1,9 +1,10 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { initializeApp } from 'firebase/app';
-import { getAuth,createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { useNavigation } from '@react-navigation/native';
-import { HomeStackRoutes } from "../../app/navigation/routes";
-
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC72QT2wPweAtymWMkUsCeK2z0_I1Usf6M",
@@ -14,52 +15,78 @@ const firebaseConfig = {
   appId: "1:522297255818:web:5c8b1cdcff3229f8c50a73",
   measurementId: "G-0279Q44FMF",
 };
+
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
-interface AuthPayload {
+
+export interface AuthPayload {
   email: string;
   password: string;
-  authState: AuthState;
-  user: any; 
-  loading: boolean;
-  error: string | null;
 }
+
 export enum AuthState {
-  Authenticated = 'Authenticated',
-  Unauthenticated = 'Unauthenticated',
+  Authenticated = "Authenticated",
+  Unauthenticated = "Unauthenticated",
 }
+
+type User = {
+  email: string;
+  name: string;
+  id: string;
+};
+
 interface UserState {
-  authState: AuthState; 
-  user: any;
+  authState: AuthState;
+  user: User;
   loading: boolean;
   error: any;
 }
 
 export const signUpUser = createAsyncThunk(
-  'firebase/signUpUser',
-  async ({ email, password }: AuthPayload, { rejectWithValue }) => {
+  "firebase/signUpUser",
+  async (payload: AuthPayload, { rejectWithValue }) => {
+    const { email, password } = payload;
+    console.log("THINK ACTION SIGN UP::");
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      console.log('first', userCredential)
-      return userCredential.user;
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      console.log("THINK ACTION SIGN UP SUCCESS:: ", userCredential.user);
+      const user = {
+        name: userCredential.user.displayName,
+        id: userCredential.user.uid,
+        email: userCredential.user.email,
+      };
+      return user;
     } catch (error) {
+      console.log("THINK ACTION SIGN UP ERROR:: ", error);
       return rejectWithValue(error.message);
     }
   }
 );
 export const loginUser = createAsyncThunk(
-  'firebase/loginUser',
+  "firebase/loginUser",
   async ({ email, password }: AuthPayload, { rejectWithValue }) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log('User UID:', userCredential.user.uid);
-      return userCredential.user.uid; 
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = {
+        name: userCredential.user.displayName,
+        id: userCredential.user.uid,
+        email: userCredential.user.email,
+      };
+      return user;
     } catch (error) {
       return rejectWithValue(error.message);
     }
   }
 );
-
 
 const initialState: UserState = {
   authState: AuthState.Unauthenticated,
@@ -69,7 +96,7 @@ const initialState: UserState = {
 };
 
 const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -81,6 +108,7 @@ const userSlice = createSlice({
       .addCase(signUpUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
+        state.authState = AuthState.Authenticated;
       })
       .addCase(signUpUser.rejected, (state, action) => {
         state.loading = false;
@@ -93,6 +121,7 @@ const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
+        state.authState = AuthState.Authenticated
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;

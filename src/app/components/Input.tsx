@@ -1,15 +1,32 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import PropTypes from "prop-types";
-import { StyleSheet, TextInput, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  TextInput,
+  View,
+  TouchableOpacity,
+  TextInputProps,
+} from "react-native";
 
-const Input = ({
-  placeholder,
-  value,
-  onChangeText,
-  secureTextEntry,
-  style,
-  rightIcon,
-}) => {
+type RightIconType = {
+  icon: ReactNode;
+  onPress: VoidFunction;
+};
+
+type InputProps = TextInputProps & {
+  rightIcon?: RightIconType;
+};
+
+const Input = (props: InputProps) => {
+  const {
+    placeholder,
+    value,
+    onChangeText,
+    secureTextEntry,
+    style,
+    rightIcon,
+  } = props;
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -29,22 +46,6 @@ const Input = ({
       )}
     </View>
   );
-};
-
-Input.propTypes = {
-  placeholder: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
-  onChangeText: PropTypes.func.isRequired,
-  secureTextEntry: PropTypes.bool,
-  style: PropTypes.object,
-  rightIcon: PropTypes.shape({
-    icon: PropTypes.element.isRequired,
-    onPress: PropTypes.func.isRequired,
-  }),
-};
-
-Input.defaultProps = {
-  secureTextEntry: false,
 };
 
 export default Input;

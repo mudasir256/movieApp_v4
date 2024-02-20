@@ -1,12 +1,12 @@
 import { NavigationContainer } from "@react-navigation/native";
 import HomeStack from "./HomeStack";
-import { useSelector } from "react-redux";
 import { AuthState } from "./../store/userSlice";
 import LoginStack from "./LoginStack";
-import { RootState } from "./../store/store";
+import { useAppSelector } from "./../store/store";
+import { selectAuthState } from "../../app/store/selectors";
 
 export const RootNavigator = () => {
-  const authState = useSelector((state: RootState) => state.user.authState);
+  const authState = useAppSelector(selectAuthState);
 
   return (
     <NavigationContainer>

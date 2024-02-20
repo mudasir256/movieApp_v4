@@ -1,24 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { HomeStackRoutes, LoginStackRoutes, MoviesStackRoutes } from "./routes";
+import { HomeStackRoutes, MoviesStackRoutes, LoginStackRoutes } from "./routes";
 import MovieDetailsModal from "../../modules/movies/screens/MovieDetailsModal";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AllMovies from "../../modules/movies/screens/AllMovies";
-import { Ionicons } from "@expo/vector-icons";
 import Favorite from "../../modules/movies/screens/Favorite";
-import { TouchableOpacity } from "react-native";
-import LoginStack from "./LoginStack";
+import { Ionicons } from "@expo/vector-icons";
+import { Alert, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
+import { useDispatch } from 'react-redux';
+import  Modal  from "../components/Modal";
 const Stack = createStackNavigator();
 const BottomTab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => {
+  const [showModal, setShowModal] = useState(false)
+  const dispatch = useDispatch();
   const navigation = useNavigation();
-
   const handleLogout = () => {
-    navigation.navigate(LoginStackRoutes.Login);
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to log out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Logout",
+          onPress: () => {
+            dispatch(logoutUser());
+            navigation.navigate(LoginStackRoutes.Login);
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
+  
 
   return (
     <BottomTab.Navigator
@@ -59,6 +78,7 @@ const BottomTabNavigator = () => {
           ),
         }}
       />
+      {showModal && <Modal navigation={undefined}/>}
     </BottomTab.Navigator>
   );
 };
@@ -79,12 +99,11 @@ const HomeStack = () => (
         headerTintColor: "#ffffff",
       })}
     />
-    <Stack.Screen
-      name={LoginStackRoutes.Login}
-      component={LoginStack}
-      options={{ headerShown: false }}
-    />
   </Stack.Navigator>
 );
 
 export default HomeStack;
+function logoutUser(): any {
+  throw new Error("Function not implemented.");
+}
+

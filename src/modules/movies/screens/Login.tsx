@@ -8,17 +8,14 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
-import { loginUser } from "../../../app/store/userSlice";
+import { AuthPayload, loginUser } from "../../../app/store/userSlice";
 import Input from "../../../app/components/Input";
 import Button from "../../../app/components/Button";
 import { Ionicons } from "@expo/vector-icons";
 import Loader from "../../../app/components/Loader";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootNavigationProps } from "../../../app/navigation/LoginStack";
-import { HomeStackRoutes, LoginStackRoutes } from "../../../app/navigation/routes";
-import { signInWithEmailAndPassword } from "@firebase/auth";
-import { getAuth } from "firebase/auth";
+import { useAppDispatch } from "../../../app/store/store";
 
 type LoginScreenNavigationProp = StackNavigationProp<
   RootNavigationProps,
@@ -27,49 +24,41 @@ type LoginScreenNavigationProp = StackNavigationProp<
 
 const Login = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
-  const auth = getAuth();
+
   const handleTouchablePress = () => {
     Keyboard.dismiss();
   };
   const handleLoginPress = async () => {
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      setShowLoader(true);
-      const user = userCredential.user;
-      console.log(user.email);
-      navigation.navigate(HomeStackRoutes.Home);
+    const authPayload: AuthPayload = {
+      email: email,
+      password: password,
+    };
+  
+    setShowLoader(true);
+    console.log("DISPATCHING");
+    const result = await dispatch(loginUser(authPayload)); 
+    if (result){
+      Alert.alert("Successfully Logged In");
       setShowLoader(false);
-    } catch (error) {
-      alert(error.message);
+      // if (result) {
+      //   Alert.alert("Successfully Logged In");
+      // } else {
+      //   Alert.alert("Incorrect email or password. Please try again.");
+      // }
+    } else {
+      Alert.alert("Incorrect email or password. Please try again.");
     }
   };
-  // const handleLoginPress = async () => {
-  //   try {
-  //     setShowLoader(true);
-  //     if (!email || !password) {
-  //       throw new Error("Please enter both email and password");
-  //     }
-  //     await dispatch(loginUser({ email, password }));
-  //     navigation.navigate(HomeStackRoutes.Home);
-  //   } catch (error) {
-  //     console.error("Authentication Error:", error.message);
-  //     Alert.alert(
-  //       "Authentication Error",
-  //       "Invalid email or password. Please try again."
-  //     );
-  //   } finally {
-  //     setShowLoader(false);
-  //   }
-  // };
+  
+  
+  
+
+
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);

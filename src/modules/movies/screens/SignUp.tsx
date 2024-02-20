@@ -1,24 +1,28 @@
-import React, { useState } from "react";
-import { StyleSheet, View, Keyboard, Alert, TouchableWithoutFeedback } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Keyboard,
+  Alert,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { createUserWithEmailAndPassword } from "firebase/auth"; 
-import { getAuth } from "firebase/auth"; 
 import Input from "../../../app/components/Input";
 import Button from "../../../app/components/Button";
+import { AuthPayload, signUpUser } from "../../../app/store/userSlice";
+import { useAppDispatch } from "../../../app/store/store";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const auth = getAuth(); 
+  const dispatch = useAppDispatch();
 
   const handleSignUp = async () => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(userCredentials => {
-        const user = userCredentials.user;
-        console.log(user.email); 
-      })
-      .catch(error => alert(error.message));
+    const authPayload: AuthPayload = {
+      email: email,
+      password: password,
+    };
+    dispatch(signUpUser(authPayload));
   };
 
   const handleTouchablePress = () => {
